@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FluxStock</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="tela-cadastro" class="overlay-cadastro">
+    <div class="setup-card">
+      <span class="punch left"></span>
+      <span class="punch right"></span>
+      <div class="tag-eyebrow">Bem-vindo</div>
+      <h1 class="setup-title">FluxStock — Acesso</h1>
+      <p class="boas-vindas-texto">Sistema de Gerenciamento e Suporte ao Empreendedor. Cadastre sua empresa pela primeira vez ou acesse uma empresa já existente informando a senha de acesso.</p>
+
+      <div class="modo-opcoes" id="modo-opcoes">
+        <button type="button" class="modo-btn ativo" data-modo="nova">Nova Empresa</button>
+        <button type="button" class="modo-btn" data-modo="login">Já tenho empresa</button>
+      </div>
+
+      <!-- -------- Formulário: cadastro de nova empresa -------- -->
+      <div id="form-nova-empresa">
+        <label for="input-ceo">Nome do CEO / Responsável</label>
+        <input id="input-ceo" type="text" placeholder="Seu nome" autocomplete="off">
+
+        <label for="input-empresa">Nome da Empresa</label>
+        <input id="input-empresa" type="text" placeholder="Nome da sua empresa" autocomplete="off">
+
+        <label>Nicho da Empresa</label>
+        <div class="nicho-opcoes" id="nicho-opcoes">
+          <button type="button" class="nicho-btn" data-nicho="1">🍎 Alimentos</button>
+          <button type="button" class="nicho-btn" data-nicho="2">👕 Vestuários</button>
+          <button type="button" class="nicho-btn" data-nicho="3">💄 Cosméticos</button>
+          <button type="button" class="nicho-btn" data-nicho="4">📦 Varejo</button>
+        </div>
+
+        <label for="input-senha-nova">Senha de Acesso</label>
+        <input id="input-senha-nova" type="password" placeholder="Crie uma senha" autocomplete="off">
+
+        <label for="input-senha-nova-confirma">Confirmar Senha</label>
+        <input id="input-senha-nova-confirma" type="password" placeholder="Repita a senha" autocomplete="off">
+
+        <label for="input-palavra-chave">Palavra-chave de Segurança</label>
+        <input id="input-palavra-chave" type="text" placeholder="Usada para recuperar a senha, guarde-a bem" autocomplete="off">
+
+        <button type="button" id="btn-criar-empresa" class="btn-cadastrar">Criar empresa e entrar</button>
+      </div>
+
+      <!-- -------- Formulário: login em empresa já cadastrada -------- -->
+      <div id="form-login-empresa" style="display:none;">
+        <label for="select-empresa-login">Empresa cadastrada</label>
+        <select id="select-empresa-login"></select>
+
+        <div id="grupo-senha-login">
+          <label for="input-senha-login">Senha de Acesso</label>
+          <input id="input-senha-login" type="password" placeholder="Digite a senha" autocomplete="off">
+
+          <button type="button" id="btn-login-empresa" class="btn-cadastrar">Entrar</button>
+          <button type="button" id="btn-excluir-empresa" class="btn-excluir-empresa">Excluir empresa</button>
+        </div>
+
+        <button type="button" id="link-esqueci-senha" class="link-esqueci">Esqueci minha senha</button>
+
+        <div id="form-recuperar-senha" style="display:none;">
+          <label for="input-palavra-chave-recuperar" id="label-palavra-chave-recuperar">Palavra-chave de Segurança</label>
+          <input id="input-palavra-chave-recuperar" type="text" placeholder="Informe a palavra-chave cadastrada" autocomplete="off">
+
+          <label for="input-senha-recuperar-nova">Nova Senha</label>
+          <input id="input-senha-recuperar-nova" type="password" placeholder="Crie uma nova senha" autocomplete="off">
+
+          <label for="input-senha-recuperar-confirma">Confirmar Nova Senha</label>
+          <input id="input-senha-recuperar-confirma" type="password" placeholder="Repita a nova senha" autocomplete="off">
+
+          <button type="button" id="btn-redefinir-senha" class="btn-cadastrar">Redefinir senha e entrar</button>
+          <button type="button" id="btn-cancelar-recuperar" class="btn-excluir-empresa">Cancelar</button>
+        </div>
+      </div>
+
+      <div id="erro-cadastro" class="erro-msg"></div>
+    </div>
+  </div>
+
+  <!-- ======================= APLICAÇÃO PRINCIPAL ======================= -->
+  <div id="app-container" style="display:none;">
+  <div class="wrap">
+    <div class="header-row">
+      <div class="title-block">
+        <div class="title-linha">
+          <h1>Estoque</h1>
+          <nav class="tab-nav" id="tab-nav">
+            <button type="button" class="tab-btn ativo" data-tab="estoque">Estoque</button>
+            <button type="button" class="tab-btn" data-tab="fornecedores">Fornecedores</button>
+            <button type="button" class="tab-btn" data-tab="compras">Compras</button>
+            <button type="button" class="tab-btn" data-tab="clientes">Clientes</button>
+            <button type="button" class="tab-btn" data-tab="relatorios">Relatórios</button>
+            <button type="button" class="tab-btn" data-tab="financeiro">Financeiro</button>
+            <button type="button" class="tab-btn btn-sair" id="btn-logout">Sair</button>
+          </nav>
+        </div>
+        <p>Controle de produtos &amp; quantidades</p>
+      </div>
+      <div class="barcode" aria-hidden="true">
+        <span style="height:70%"></span>
+        <span style="height:100%"></span>
+        <span style="height:50%"></span>
+        <span style="height:90%"></span>
+        <span style="height:60%"></span>
+        <span style="height:100%"></span>
+        <span style="height:40%"></span>
+        <span style="height:80%"></span>
+      </div>
+    </div>
+
+    <div id="boas-vindas-banner" class="boas-vindas-banner"></div>
+    <div id="alerta-nicho" class="alerta-nicho"></div>
+    <div id="alerta-resumo" class="alerta-resumo"></div>
+
+    <!-- ---------------- ABA: ESTOQUE ---------------- -->
+    <div id="tab-estoque" class="tab-content ativo">
+    <div class="grid">
+      <div class="tag-card">
+        <span class="punch left"></span>
+        <span class="punch right"></span>
+        <div class="tag-eyebrow">Cadastrar produto</div>
+
+        <form id="form-produto">
+          <label for="nome">Nome do produto</label>
+          <input id="nome" type="text" placeholder="Ex.: Caneta azul" autocomplete="off">
+
+          <label for="categoria">Categoria</label>
+          <input id="categoria" type="text" placeholder="Ex.: Papelaria" autocomplete="off" list="lista-categorias">
+          <datalist id="lista-categorias"></datalist>
+
+          <!-- Campos exclusivos do nicho Alimentos: controle de lote e validade (FEFO) -->
+          <div class="campo-nicho campo-alimentos" style="display:none;">
+            <label for="validade">Data de Validade</label>
+            <input id="validade" type="date">
+
+            <label for="numeroLote">Número do Lote</label>
+            <input id="numeroLote" type="text" placeholder="Ex.: L2026-08" autocomplete="off">
+          </div>
+
+          <!-- Campos exclusivos do nicho Vestuário: grade de tamanhos e fornecedor -->
+          <div class="campo-nicho campo-vestuario" style="display:none;">
+            <label for="tamanho">Tamanho</label>
+            <select id="tamanho">
+              <option value="">Selecione</option>
+              <option value="PP">PP</option>
+              <option value="P">P</option>
+              <option value="M">M</option>
+              <option value="G">G</option>
+              <option value="GG">GG</option>
+              <option value="Único">Único</option>
+            </select>
+
+            <label for="medidas">Medidas</label>
+            <input id="medidas" type="text" placeholder="Ex.: 70cm x 52cm" autocomplete="off">
+
+            <label for="cor">Cor</label>
+            <input id="cor" type="text" placeholder="Ex.: Azul marinho" autocomplete="off">
+
+            <label for="fornecedorProduto">Fornecedor</label>
+            <select id="fornecedorProduto"><option value="">Nenhum</option></select>
+          </div>
+
+          <label for="preco">Preço (R$)</label>
+          <input id="preco" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+
+          <label for="qtd">Quantidade</label>
+          <input id="qtd" type="text" inputmode="numeric" placeholder="0" autocomplete="off">
+
+          <label for="estoqueMinimo">Estoque de segurança (mínimo)</label>
+          <input id="estoqueMinimo" type="text" inputmode="numeric" placeholder="5" autocomplete="off">
+
+          <button type="button" id="btn-cadastrar" class="btn-cadastrar">Cadastrar</button>
+
+          <div id="erro-msg" class="erro-msg"></div>
+          <div id="flash-msg" class="flash-msg"></div>
+        </form>
+      </div>
+
+      <div>
+        <div class="lista-header">
+          <h2>Produtos cadastrados</h2>
+          <span class="total" id="valor-total">Valor total: R$ 0.00</span>
+        </div>
+        <input id="busca" type="text" class="busca-input" placeholder="Buscar por nome ou categoria..." autocomplete="off">
+        <div id="filtros-grade" class="filtros-grade">
+          <select id="filtro-cor"><option value="">Todas as cores</option></select>
+          <select id="filtro-tamanho"><option value="">Todos os tamanhos</option></select>
+        </div>
+        <div id="lista-container">
+          <div class="vazio">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="painel-fefo" class="stats-card" style="display:none;">
+      <div class="tag-eyebrow">Registrar venda — prioridade FEFO (lote mais próximo do vencimento)</div>
+      <select id="fefo-produto"></select>
+      <input id="fefo-qtd" type="text" inputmode="numeric" placeholder="Quantidade a vender" class="busca-input" style="margin-top:12px;">
+      <label for="fefo-cliente">Cliente (opcional)</label>
+      <select id="fefo-cliente"><option value="">Venda avulsa (sem cliente)</option></select>
+      <button type="button" id="btn-fefo-vender" class="btn-cadastrar">Registrar Venda</button>
+      <div id="fefo-msg" class="flash-msg"></div>
+    </div>
+
+    <div class="stats-card">
+      <div class="tag-eyebrow">Análise de entradas e saídas por produto</div>
+      <select id="filtro-produto" class="select-produto">
+        <option value="">Todos os produtos</option>
+      </select>
+      <div class="analise-resumo">
+        <div class="analise-metric">
+          <span class="analise-label">Entradas</span>
+          <span class="analise-valor entrada" id="analise-entradas">0</span>
+        </div>
+        <div class="analise-metric">
+          <span class="analise-label">Saídas</span>
+          <span class="analise-valor saida" id="analise-saidas">0</span>
+        </div>
+        <div class="analise-metric">
+          <span class="analise-label">Saldo</span>
+          <span class="analise-valor" id="analise-saldo">0</span>
+        </div>
+      </div>
+      <div id="analise-lista-container" class="historico-lista">
+        <div class="vazio">Nenhuma movimentação registrada ainda.</div>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <div class="tag-eyebrow">Histórico de movimentações</div>
+      <div id="historico-container" class="historico-lista">
+        <div class="vazio">Nenhuma movimentação registrada ainda.</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ---------------- ABA: FORNECEDORES ---------------- -->
+    <div id="tab-fornecedores" class="tab-content">
+      <div class="grid">
+        <div class="tag-card">
+          <span class="punch left"></span>
+          <span class="punch right"></span>
+          <div class="tag-eyebrow">Cadastrar fornecedor</div>
+          <form id="form-fornecedor">
+            <label for="forn-razao">Razão Social</label>
+            <input id="forn-razao" type="text" placeholder="Ex.: Distribuidora XPTO Ltda" autocomplete="off">
+
+            <label for="forn-fantasia">Nome Fantasia</label>
+            <input id="forn-fantasia" type="text" placeholder="Ex.: XPTO Distribuição" autocomplete="off">
+
+            <label for="forn-doc">CNPJ / CPF</label>
+            <input id="forn-doc" type="text" placeholder="00.000.000/0000-00" autocomplete="off">
+
+            <label for="forn-tel">Telefone</label>
+            <input id="forn-tel" type="text" placeholder="(00) 00000-0000" autocomplete="off">
+
+            <label for="forn-produtos">Produtos fornecidos</label>
+            <input id="forn-produtos" type="text" placeholder="Ex.: Camisetas, calças, jaquetas" autocomplete="off">
+
+            <button type="button" id="btn-cadastrar-fornecedor" class="btn-cadastrar">Cadastrar Fornecedor</button>
+            <div id="erro-fornecedor" class="erro-msg"></div>
+            <div id="flash-fornecedor" class="flash-msg"></div>
+          </form>
+        </div>
+
+        <div>
+          <div class="lista-header">
+            <h2>Fornecedores cadastrados</h2>
+            <span class="total" id="total-fornecedores">0 fornecedores</span>
+          </div>
+          <input id="busca-fornecedor" type="text" class="busca-input" placeholder="Buscar por razão social, fantasia, CNPJ/CPF ou produto..." autocomplete="off">
+          <table class="tabela-financeira tabela-esquerda">
+            <thead>
+              <tr>
+                <th>Fantasia</th>
+                <th>Razão Social</th>
+                <th>CNPJ/CPF</th>
+                <th>Telefone</th>
+                <th>Produtos</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabela-fornecedores-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- ABA: COMPRAS ---------------- -->
+    <div id="tab-compras" class="tab-content">
+      <div class="grid">
+        <div class="tag-card">
+          <span class="punch left"></span>
+          <span class="punch right"></span>
+          <div class="tag-eyebrow">Registrar compra</div>
+          <form id="form-compra">
+            <label for="compra-fornecedor">Fornecedor</label>
+            <select id="compra-fornecedor"><option value="">Selecione um fornecedor</option></select>
+
+            <label for="compra-produto">Produto</label>
+            <input id="compra-produto" type="text" placeholder="Ex.: Arroz tipo 1" autocomplete="off" list="lista-categorias">
+
+            <label for="compra-qtd">Quantidade</label>
+            <input id="compra-qtd" type="text" inputmode="numeric" placeholder="0" autocomplete="off">
+
+            <label for="compra-valor">Valor unitário (R$)</label>
+            <input id="compra-valor" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+
+            <!-- Campo exclusivo do nicho Alimentos -->
+            <div class="campo-nicho campo-alimentos" style="display:none;">
+              <label for="compra-validade">Data de Validade</label>
+              <input id="compra-validade" type="date">
+
+              <label for="compra-lote">Número do Lote</label>
+              <input id="compra-lote" type="text" placeholder="Ex.: L2026-08" autocomplete="off">
+            </div>
+
+            <label for="compra-data">Data da compra</label>
+            <input id="compra-data" type="date">
+
+            <button type="button" id="btn-registrar-compra" class="btn-cadastrar">Registrar Compra</button>
+            <div id="erro-compra" class="erro-msg"></div>
+            <div id="flash-compra" class="flash-msg"></div>
+          </form>
+        </div>
+
+        <div>
+          <div class="lista-header">
+            <h2>Últimas compras</h2>
+          </div>
+          <table class="tabela-financeira tabela-esquerda">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Fornecedor</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-compras-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- ABA: CLIENTES ---------------- -->
+    <div id="tab-clientes" class="tab-content">
+      <div class="grid">
+        <div class="tag-card">
+          <span class="punch left"></span>
+          <span class="punch right"></span>
+          <div class="tag-eyebrow">Cadastrar cliente</div>
+          <form id="form-cliente">
+            <label for="cli-nome">Nome</label>
+            <input id="cli-nome" type="text" placeholder="Nome do cliente" autocomplete="off">
+
+            <label for="cli-tel">Telefone</label>
+            <input id="cli-tel" type="text" placeholder="(00) 00000-0000" autocomplete="off">
+
+            <label for="cli-cpf">CPF</label>
+            <input id="cli-cpf" type="text" placeholder="000.000.000-00" autocomplete="off">
+
+            <button type="button" id="btn-cadastrar-cliente" class="btn-cadastrar">Cadastrar Cliente</button>
+            <div id="erro-cliente" class="erro-msg"></div>
+            <div id="flash-cliente" class="flash-msg"></div>
+          </form>
+        </div>
+
+        <div>
+          <div class="lista-header">
+            <h2>Clientes cadastrados</h2>
+            <span class="total" id="total-clientes">0 clientes</span>
+          </div>
+          <input id="busca-cliente" type="text" class="busca-input" placeholder="Buscar por nome, telefone ou CPF..." autocomplete="off">
+          <table class="tabela-financeira tabela-esquerda">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>CPF</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabela-clientes-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- ABA: RELATÓRIOS ---------------- -->
+    <div id="tab-relatorios" class="tab-content">
+      <div class="stats-card" id="card-vencendo" style="display:none; margin-top:0;">
+        <div class="tag-eyebrow">Produtos vencendo em breve (≤ 7 dias)</div>
+        <div id="vencendo-container" class="historico-lista">
+          <div class="vazio">Nenhum produto vencendo no momento.</div>
+        </div>
+      </div>
+
+      <div class="stats-card" id="card-mais-vendidos" style="margin-top:0;">
+        <div class="tag-eyebrow">Produtos mais vendidos</div>
+        <div id="mais-vendidos-container" class="historico-lista">
+          <div class="vazio">Nenhuma venda registrada ainda.</div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="tag-eyebrow">Produtos parados em estoque</div>
+        <div id="parados-container" class="historico-lista">
+          <div class="vazio">Nenhum produto parado no momento.</div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="tag-eyebrow">Balanço de vendas final</div>
+        <div class="analise-resumo">
+          <div class="analise-metric">
+            <span class="analise-label">Total entradas</span>
+            <span class="analise-valor entrada" id="balanco-entradas">0</span>
+          </div>
+          <div class="analise-metric">
+            <span class="analise-label">Total saídas</span>
+            <span class="analise-valor saida" id="balanco-saidas">0</span>
+          </div>
+          <div class="analise-metric">
+            <span class="analise-label">Saldo em unidades</span>
+            <span class="analise-valor" id="balanco-saldo">0</span>
+          </div>
+          <div class="analise-metric">
+            <span class="analise-label">Receita total (R$)</span>
+            <span class="analise-valor entrada" id="balanco-receita">R$ 0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-financeiro" class="tab-content">
+      <div class="stats-card" style="margin-top:0;">
+        <div class="tag-eyebrow">Balanço de vendas por produto</div>
+        <table class="tabela-financeira">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Preço</th>
+              <th>Qtd. vendida</th>
+              <th>Receita total</th>
+              <th>Valor em estoque</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-financeiro-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
